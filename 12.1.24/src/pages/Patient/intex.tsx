@@ -17,7 +17,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "../../components/loader/Loader";
 import { toast } from "react-toastify";
-import "./patient.css";
+import { FaSearch } from "react-icons/fa";
 interface FormData {
   firstName: string;
   middleName: string;
@@ -35,10 +35,12 @@ interface FormData {
   gender: string;
   country: string;
   id: string;
+  active:string;
 
 }
 
 const Patient: React.FC = () => {
+  const [search,setSearch]=useState("");
   const dispatch = useDispatch<any>();
   const [selectPatientId, setSelectPatientId] = useState<string | null>(null);
   const [editModal, setEditModal] = useState(false);
@@ -49,6 +51,7 @@ const Patient: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     id:'',
+    active:"",
     firstName: "",
     middleName: "",
     lastName: "",
@@ -224,9 +227,9 @@ const Patient: React.FC = () => {
       {loading && <Loader />}
 
       <div className="row mb-2">
-        <div className="col-md-8">
+        <div className="col-md-5">
           <div className="heading1">
-            <h4>All patient List</h4>
+            <h4>All Patient List</h4>
             <br />
             </div>
         </div>
@@ -239,7 +242,19 @@ const Patient: React.FC = () => {
             />
           </div>
         </div>
+        <div className="col-md-3">
+          <div className="mx-2 search-container">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="search"
+              onChange={(e) => setSearch(e.target.value)}
+            />
+             <FaSearch className="search-icon" />
+          </div>
         </div>
+        </div>
+        <br></br>
         <Table responsive bordered>
           <thead>
             <tr>
@@ -255,7 +270,10 @@ const Patient: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {currentPatientData.map((patient: any,index:number) => (
+            {currentPatientData.filter((patient:any)=>patient.basicDetails[0].name[0].given.toLowerCase().includes(search.toLowerCase())||
+            patient.basicDetails[0].birthDate.toString().includes(search)||
+            patient.basicDetails[0].ssn.toString().includes(search)||
+            patient.email.toLowerCase().includes(search.toLowerCase)).map((patient: any,index:number) => (
               <tr key={index}>
                 <td className="text-center">{index+1}</td>
                 <td className="text-center"

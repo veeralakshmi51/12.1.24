@@ -3,13 +3,27 @@ import { FaPlus } from "react-icons/fa";
 import { Pagination } from "react-bootstrap";
 import "./staff.css";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllStaff, deleteStaffDetails,updateStaffDetails} from "../../slices/thunk";
+import {
+  getAllStaff,
+  deleteStaffDetails,
+  updateStaffDetails,
+} from "../../slices/thunk";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { Modal, ModalFooter, ModalHeader, ModalBody, Button,Table } from "reactstrap";
+import {
+  Modal,
+  ModalFooter,
+  ModalHeader,
+  ModalBody,
+  Button,
+  Table,
+  FormGroup,
+  Form,
+} from "reactstrap";
+import { FaSearch } from "react-icons/fa";
 //import Loader from "../../components/loader/Loader";
 // interface FormData {
 //   firstName: string;
@@ -35,6 +49,7 @@ import { Modal, ModalFooter, ModalHeader, ModalBody, Button,Table } from "reacts
 // }
 
 const Staff: React.FC = () => {
+  const [search, setSearch] = useState("");
   //const [selectStaffId, setSelectStaffId] = useState<string | null>(null);
   const dispatch = useDispatch<any>();
   const { staffData, loading } = useSelector((state: any) => state.Staff);
@@ -68,12 +83,13 @@ const Staff: React.FC = () => {
   // });
 
   useEffect(() => {
-    getAllStaff(dispatch,organization);
+    getAllStaff(dispatch, organization);
   }, [dispatch, organization]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentStaffData = staffData && staffData?.slice(indexOfFirstItem, indexOfLastItem);
+  const currentStaffData =
+    staffData && staffData?.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
   const renderPageNumbers = () => {
@@ -118,7 +134,7 @@ const Staff: React.FC = () => {
     const confirmDelete = window.confirm("Are You Sure Do You Want To Delete?");
     if (confirmDelete) {
       try {
-        await dispatch(deleteStaffDetails(username,organization));
+        await dispatch(deleteStaffDetails(username, organization));
         toast.success("Staff Details deleted successfully");
       } catch (error) {
         toast.error("Failed to delete organization");
@@ -217,12 +233,13 @@ const Staff: React.FC = () => {
   //     [name]: value,
   //   }));
   // };
+  console.log("search", search);
   return (
-    <div className="container m5 p3" style={{ width: '90%' }}>
+    <div className="container m5 p3" style={{ width: "90%" }}>
       <div className="row">
-        <div className="col-md-8">
+        <div className="col-md-5">
           <div className="heading1">
-            <h4>All Staff List</h4>
+            <h3>All Staff List</h3>
           </div>
         </div>
         <div className="col-md-4">
@@ -234,28 +251,54 @@ const Staff: React.FC = () => {
             />
           </div>
         </div>
+        <div className="col-md-3">
+          <div className="mx-2 search-container">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="search"
+              onChange={(e) => setSearch(e.target.value)}
+            />
+             <FaSearch className="search-icon" />
+          </div>
+        </div>
       </div>
-        <Table className="table table-bordered">
-          <thead>
-            <tr>
-              <th scope="col">S.No</th>
-              <th scope="col">Staff Name</th>
-              <th scope="col">Staff ID</th>
-              <th scope="col">Date of Birth</th>
-              <th scope="col">SSN</th>
-              <th scope="col">Job Title</th>
-              <th scope="col">Role</th>
-              {/* <th scope="col">Email</th> */}
-              <th scope="col">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentStaffData.map((staff: any,index:number) => (
+      <br></br>
+      <Table className="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">S.No</th>
+            <th scope="col">Staff Name</th>
+            <th scope="col">Staff ID</th>
+            <th scope="col">Date of Birth</th>
+            <th scope="col">SSN</th>
+            <th scope="col">Job Title</th>
+            <th scope="col">Role</th>
+            {/* <th scope="col">Email</th> */}
+            <th scope="col" className="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentStaffData
+            .filter(
+              (staff: any) =>
+                staff.name[0].given
+                  .toLowerCase()
+                  .includes(search.toLowerCase()) ||
+                staff.dateofBirth.toString().includes(search) || 
+                staff.ssn.toLowerCase().includes(search.toLowerCase()) ||
+                staff.email.toLowerCase().includes(search.toLowerCase()) ||
+                staff.role.toLowerCase().includes(search.toLowerCase()) ||
+                staff.userType.toLowerCase().includes(search.toLowerCase())
+            )
+            .map((staff: any, index: number) => (
               <tr key={index}>
-                <td>{index+1}</td>
+                <td>{index + 1}</td>
                 <td
                   style={{ cursor: "pointer" }}
-                  onClick={() =>navigate(`/staff-update/${staff.id}`, {state: staff })}
+                  onClick={() =>
+                    navigate(`/staff-update/${staff.id}`, { state: staff })
+                  }
                 >
                   {staff.name[0].given} {staff.name[0].family}
                 </td>
@@ -275,10 +318,10 @@ const Staff: React.FC = () => {
                 </td>
               </tr>
             ))}
-          </tbody>
-        </Table>
+        </tbody>
+      </Table>
 
-        {/* <Modal isOpen={editModal} toggle={() => setEditModal(false)} centered>
+      {/* <Modal isOpen={editModal} toggle={() => setEditModal(false)} centered>
           <ModalHeader toggle={() => setEditModal(false)}>
             <h3>Staff Details</h3>
           </ModalHeader>
@@ -570,22 +613,20 @@ const Staff: React.FC = () => {
             </Button>
           </ModalFooter>
         </Modal> */}
-        <Pagination className='d-flex justify-content-center align-items-center '>
-          <Pagination.Prev
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-          />
+      <Pagination className="d-flex justify-content-center align-items-center ">
+        <Pagination.Prev
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+        />
 
-          {renderPageNumbers()}
+        {renderPageNumbers()}
 
-          <Pagination.Next
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={
-              currentPage === Math.ceil(staffData.length / itemsPerPage)
-            }
-          />
-        </Pagination>
-      </div>
+        <Pagination.Next
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === Math.ceil(staffData.length / itemsPerPage)}
+        />
+      </Pagination>
+    </div>
   );
 };
 

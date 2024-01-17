@@ -35,9 +35,9 @@ const AdminRoutes = [
   { path: '/staff-register', component: <StaffCreation/>},
   { path: '/patient-register', component: <PatientCreation/>},
   { path: '/q15-report', component: <Q15Report/>},
-  {path:'/bed-assign', component:<BedCreation/>},
-  {path:'/bed-table',component:<BedAssign/>},
-  {path:'/patient-assign',component:<PatientAssign/>},
+  {path:'/management/bed-assign', component:<BedCreation/>},
+  {path:'/management/bed-table',component:<BedAssign/>},
+  {path:'/management/patient-assign',component:<PatientAssign/>},
   {path:'/patient-update/:id',component:<PatientUpdation/>},
   {path:'/staff-update/:id',component:<StaffUpdation/>}
 
