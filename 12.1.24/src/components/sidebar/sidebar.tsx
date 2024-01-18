@@ -166,7 +166,7 @@ const Sidebar = (props: SidebarProps) => {
                           key={subIndex}
                           className="link"
                         >
-                          <div className="icon">{subItem.icon}</div>
+                          <div className="icon" style={{marginLeft:'15%'}}>{subItem.icon}</div>
                           <div className="link_text">{subItem.name}</div>
                         </NavLink>
                       ))}

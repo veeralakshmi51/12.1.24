@@ -406,12 +406,12 @@ const PatientCreation: React.FC = () => {
       console.log('API response:', response.data);
       console.log('Request : ', requestBody)
       if (response.data.message && response.data.message.code === 'MHC - 0200') {
-        toast.success(response.data.message.description)
+        alert(response.data.message.description)
         navigate('/patient-table');
       } else {
         console.log('Request : ', requestBody)
         console.log('Error Registering:',response.data.message)
-        toast.warning(`Error: ${response.data.message.description}`);
+        alert(`Error: ${response.data.message.description}`);
 
     }
   }catch (error) {
@@ -544,7 +544,6 @@ const PatientCreation: React.FC = () => {
           <Button label="Cancel" onClick={() => { navigate('/patient-table') }} severity="secondary" style={{ color: '#000', backgroundColor: '#fff', border: '2px solid #0f3995' }} />
           <Button label="Save" style={{ backgroundColor: '#0f3995' }} onClick={handleSaveClick} />
         </div>
-        <ToastContainer/>
       </div>
     </div>
   );

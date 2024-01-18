@@ -1,127 +1,14 @@
-// import React, { useEffect, useState } from "react";
-// import { Link } from "react-router-dom";
-// import { getAllOrganizationDetails } from "../../slices/organizationDetails/thunk";
-// import { useDispatch, useSelector } from "react-redux";
-
-// const Organization: React.FC = () => {
-//   const dispatch = useDispatch<any>();
-//   const { organizationDetails } = useSelector(
-//     (state: any) => state.Organization
-//   );
-
-//   const itemsPerPage = 8;
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const totalPages = Math.ceil(organizationDetails.length / itemsPerPage);
-//   const lastIndex = currentPage * itemsPerPage;
-//   const firstIndex = lastIndex - itemsPerPage;
-//   const records = organizationDetails.slice(firstIndex, lastIndex);
-//   const numbers = [...Array(totalPages).keys()].map((num) => num + 1);
-
-//   useEffect(() => {
-//     dispatch(getAllOrganizationDetails());
-//   }, [dispatch]);
-
-//   function prevPage() {
-//     if (currentPage > 1) {
-//       setCurrentPage(currentPage - 1);
-//     }
-//   }
-
-//   function changecurrentpage(page: number) {
-//     setCurrentPage(page);
-//   }
-
-//   function nextPage() {
-//     if (currentPage < totalPages) {
-//       setCurrentPage(currentPage + 1);
-//     }
-//   }
-
-//   return (
-//     <div className="container mt-5">
-//       <div className="row">
-//         <div className="mt-3 col-md-12">
-//           <h2>Organization Details</h2><Link to="/organization-form">
-//             <button className="btn btn-info">+ </button>
-//           </Link>
-//           <hr></hr>
-//           <br></br><br></br>
-//           <table className="table table-bordered">
-//             <thead>
-//               <tr>
-//                 <th scope="col">#</th>
-//                 <th scope="col">Organization Name</th>
-//                 <th scope="col">Organization Type</th>
-//                 <th scope="col">Email</th>
-//                 <th scope="col">Mobile Number</th>
-//                 <th scope="col">Website URL</th>
-//                 <th scope="col">Hippa Privacy Officer Name</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {records.map((organization: any, index: number) => (
-//                 <tr key={index}>
-//                   <td>{index + 1}</td>
-//                   <td>{organization.organizationdetails[0].name}</td>
-//                   <td>{organization.organizationdetails[0].type}</td>
-//                   <td>{organization.email}</td>
-//                   <td>{organization.mobileNumber}</td>
-//                   <td>{organization.websiteUrl}</td>
-//                   <td>
-//                     {organization.hippaprivacyofficer.length > 0
-//                       ? organization.hippaprivacyofficer[0].name
-//                       : ""}
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-
-//         <br></br>
-//           <nav>
-//             <ul className="pagination">
-//               <li className="page-item">
-//                 <a href="#" className="page-link" onClick={prevPage}>
-//                   Prev
-//                 </a>
-//               </li>
-//               {numbers.map((num, index) => (
-//                 <li key={index} className="page-item">
-//                   <a
-//                     href="#"
-//                     className={`page-link ${currentPage === num ? 'active' : ''}`}
-//                     onClick={() => changecurrentpage(num)}
-//                   >
-//                     {num}
-//                   </a>
-//                 </li>
-//               ))}
-//               <li className="page-item">
-//                 <a href="#" className="page-link" onClick={nextPage}>
-//                   Next
-//                 </a>
-//               </li>
-//             </ul>
-//           </nav>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Organization;
-
-
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { getAllOrganizationDetails, updateOrganizationDetails,deleteOrganizationDetails } from "../../slices/organizationDetails/thunk";
+import { getAllOrganizationDetails,deleteOrganizationDetails } from "../../slices/organizationDetails/thunk";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+//import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { useNavigate } from "react-router-dom";
+import { Table } from "reactstrap";
+import Loader from "../../components/loader/Loader";
+import { FaPlus,FaSearch } from "react-icons/fa";
 interface FormData {
   organizationName: string;
   email: string;
@@ -133,15 +20,17 @@ interface FormData {
   proximityVerification: string;
   geofencing: string;
   q15Access: string;
+  starttime:string;
+  duration:string;
 
 }
 
 const Organization: React.FC = () => {
-  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string | null>(null);
-
+ // const [selectedOrganizationId, setSelectedOrganizationId] = useState<string | null>(null);
+  const [search,setSearch]=useState("");
   const dispatch = useDispatch<any>();
-  const { organizationDetails } = useSelector((state: any) => state.Organization);
-
+  const { organizationDetails,loading } = useSelector((state: any) => state.Organization);
+  const navigate=useNavigate();
   const itemsPerPage = 6;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(organizationDetails.length / itemsPerPage);
@@ -151,16 +40,18 @@ const Organization: React.FC = () => {
   const numbers = [...Array(totalPages).keys()].map((num) => num + 1);
   const [editModal, setEditModal] = useState(false);
   const [formData, setFormData] = useState<FormData>({
+    id: "",
     organizationName: "",
     email: "",
     mobileNumber: "",
     websiteUrl: "",
     hippaPrivacyOfficerName: "",
     organizationType:'',
-    id: "",
     proximityVerification: "",
     geofencing: "",
     q15Access: "",
+    starttime:'',
+    duration:'',
   });
 
   useEffect(() => {
@@ -183,106 +74,110 @@ const Organization: React.FC = () => {
     }
   }
 
-  const handleSaveChanges = () => {
-    console.log("Selected organization ID:", selectedOrganizationId);
-    console.log("Form data:", formData);
+//   const handleSaveChanges = () => {
+//     console.log("Selected organization ID:", selectedOrganizationId);
+//     console.log("Form data:", formData);
 
-    if (!selectedOrganizationId) {
-        console.error("Selected organization ID not found");
-        return;
-    }
+//     if (!selectedOrganizationId) {
+//         console.error("Selected organization ID not found");
+//         return;
+//     }
 
-//     dispatch(updateOrganizationDetails(selectedOrganizationId, formData))
-//         .then(() => {
-//             setEditModal(false);
-//             toast.success("Organization details updated successfully.");
-//         })
-//         .catch((error:Error) => {
-//             console.error("Error updating organization details:", error);
-//             toast.error("Error updating organization details. Please try again.");
-//         });
+// const updatedFields = {
+//   id:"",
+//   organizationdetails: [
+//     {
+//       name: formData.organizationName,
+//       type: formData.organizationType
+//     }
+//   ],
+//   email: formData.email,
+//   websiteUrl: formData.websiteUrl,
+//   hippaprivacyofficer: [
+//     {
+//      name: formData.hippaPrivacyOfficerName
+//     }
+//     ],
+//   mobileNumber:formData.mobileNumber,
 // };
-
-const updatedFields = {
-  organizationdetails: [
-    {
-      name: formData.organizationName,
-      type: formData.organizationType
-    }
-  ],
-  email: formData.email,
-  websiteUrl: formData.websiteUrl,
-  hippaprivacyofficer: [
-    {
-     name: formData.hippaPrivacyOfficerName
-    }
-    ],
-  mobileNumber:formData.mobileNumber,
-};
-console.log("BeforeUpdate:",organizationDetails)
-dispatch(updateOrganizationDetails(selectedOrganizationId, updatedFields));
-console.log("After Upadate",updatedFields)
-setEditModal(false);
-};
-  const handleClick = (organization: any) => {
-    console.log("Clicked Organization:", organization);
-    const organizationDetails = organization.organizationdetails && organization.organizationdetails[0];
-    console.log("Organization Details:", organizationDetails);
+// console.log("BeforeUpdate:",organizationDetails)
+// dispatch(updateOrganizationDetails(selectedOrganizationId, updatedFields));
+// console.log("After Upadate",updatedFields)
+// setEditModal(false);
+// };
+  // const handleClick = (organization: any) => {
+  //   console.log("Clicked Organization:", organization);
+  //   const organizationDetails = organization.organizationdetails && organization.organizationdetails[0];
+  //   console.log("Organization Details:", organizationDetails);
   
-    if (organizationDetails) {
-      const organizationId = organization.id || "";
-      console.log("Organization ID from organizationDetails:", organizationId);
-      setSelectedOrganizationId(organizationId);
-      setFormData({
-        organizationName: organizationDetails.name || "",
-        email: organization.email || "",
-        mobileNumber: organization.mobileNumber || "",
-        websiteUrl: organization.websiteUrl || "",
-        organizationType:organizationDetails.type || '',
-      hippaPrivacyOfficerName: organization.hippaprivacyofficer[0]?.name || "",
-        id: organization.id || "",
-        proximityVerification:organization.proximityVerification || "",
-        geofencing: organization.geofencing || "",
-        q15Access : organization.q15Access || "",
-      });
-      console.log("Selected Organization ID after setting:", organizationId); 
-      setEditModal(true);
-    } else {
-      console.error("Organization details or ID not found:", organization);
-    }
-  };
+  //   if (organizationDetails) {
+  //     const organizationId = organization.id || "";
+  //     console.log("Organization ID from organizationDetails:", organizationId);
+  //     setSelectedOrganizationId(organizationId);
+  //     setFormData({
+  //       organizationName: organizationDetails.name || "",
+  //       email: organization.email || "",
+  //       mobileNumber: organization.mobileNumber || "",
+  //       websiteUrl: organization.websiteUrl || "",
+  //       organizationType:organizationDetails.type || '',
+  //     hippaPrivacyOfficerName: organization.hippaprivacyofficer[0]?.name || "",
+  //       id: organization.id || "",
+  //       proximityVerification:organization.proximityVerification || "",
+  //       geofencing: organization.geofencing || "",
+  //       q15Access : organization.q15Access || "",
+  //     });
+  //     console.log("Selected Organization ID after setting:", organizationId); 
+  //     setEditModal(true);
+  //   } else {
+  //     console.error("Organization details or ID not found:", organization);
+  //   }
+  // };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [name]: value,
+  //   }));
+  // };
 
 const handleDelete = async (organizationId: string) => {
   const confirmDelete = window.confirm("Are You sure Do You want To Delete?");
   if (confirmDelete) {
       try {
           await dispatch(deleteOrganizationDetails(organizationId));
-          toast.success("Organization Details deleted successfully");
+          alert("Organization Details deleted successfully");
       } catch (error) {
-          toast.error("Failed to delete organization");
+          alert("Failed to delete organization");
       }
   }
 };
 
   return (
-    <div className="container mt-5">
-      <ToastContainer/>
+    <div className="container mt-5" style={{width:'90%'}}>
+      {loading && <Loader/>}
       <div className="row">
-        <div className="mt-3 col-md-12">
-          <div className="d-flex justify-content-between align-items-center">
+        <div className="col-md-9">
             <h2>Organization Details</h2>
-            <Link to="/organization-form">
-              <button className="btn btn-info">+ </button>
-            </Link>
+            <FaPlus
+              data-bs-target="#exampleModal"
+              style={{ cursor: "pointer",position:'absolute',fontSize:'20px' }}
+              onClick={() => navigate("/organization-form")}
+            />
+           </div>
+           <div className="col-md-3">
+          <div className="mx-2 search-container">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="search"
+              onChange={(e) => setSearch(e.target.value)}
+            />
+             <FaSearch className="search-icon" />
           </div>
+        </div>
+        </div>
+        <br/>
           <hr />
           <br />
           <nav className="d-flex justify-content-end">
@@ -311,7 +206,7 @@ const handleDelete = async (organizationId: string) => {
             </ul>
           </nav>
           <br />
-          <table className="table table-bordered">
+          <Table >
             <thead>
               <tr>
                 <th scope="col" className="text-center">S.No #</th>
@@ -334,7 +229,7 @@ const handleDelete = async (organizationId: string) => {
                   <td>{index + 1}</td>
                   <td
                     style={{ cursor: "pointer" }}
-                    onClick={() => handleClick(organization)}
+                    onClick={() => navigate(`/organization-update/${organization.id}`)}
                     
                   >
                     {organization.organizationdetails?.[0]?.name || ""}
@@ -365,9 +260,9 @@ const handleDelete = async (organizationId: string) => {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </Table>
 
-          <Modal isOpen={editModal} toggle={() => setEditModal(false)} centered>
+          {/* <Modal isOpen={editModal} toggle={() => setEditModal(false)} centered>
             <ModalHeader toggle={() => setEditModal(false)}>
               Organization Details
             </ModalHeader>
@@ -444,9 +339,9 @@ const handleDelete = async (organizationId: string) => {
                 Cancel
               </Button>
             </ModalFooter>
-          </Modal>
-        </div>
-      </div>
+          </Modal> */}
+       
+      
     </div>
   );
 };

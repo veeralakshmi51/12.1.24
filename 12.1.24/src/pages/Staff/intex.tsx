@@ -237,19 +237,14 @@ const Staff: React.FC = () => {
   return (
     <div className="container m5 p3" style={{ width: "90%" }}>
       <div className="row">
-        <div className="col-md-5">
-          <div className="heading1">
-            <h3>All Staff List</h3>
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div className="mx-2 ">
+        <div className="col-md-9">
+            <h2>All Staff List</h2>
             <FaPlus
               data-bs-target="#exampleModal"
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer",position:'absolute',fontSize:'20px' }}
               onClick={() => navigate("/staff-register")}
             />
-          </div>
+          
         </div>
         <div className="col-md-3">
           <div className="mx-2 search-container">
@@ -264,6 +259,20 @@ const Staff: React.FC = () => {
         </div>
       </div>
       <br></br>
+      <hr></hr>
+      <Pagination className="d-flex justify-content-end ">
+        <Pagination.Prev
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+        />
+
+        {renderPageNumbers()}
+
+        <Pagination.Next
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === Math.ceil(staffData.length / itemsPerPage)}
+        />
+      </Pagination>
       <Table className="table table-bordered">
         <thead>
           <tr>
@@ -613,19 +622,7 @@ const Staff: React.FC = () => {
             </Button>
           </ModalFooter>
         </Modal> */}
-      <Pagination className="d-flex justify-content-center align-items-center ">
-        <Pagination.Prev
-          onClick={() => setCurrentPage(currentPage - 1)}
-          disabled={currentPage === 1}
-        />
-
-        {renderPageNumbers()}
-
-        <Pagination.Next
-          onClick={() => setCurrentPage(currentPage + 1)}
-          disabled={currentPage === Math.ceil(staffData.length / itemsPerPage)}
-        />
-      </Pagination>
+      
     </div>
   );
 };

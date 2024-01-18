@@ -17,14 +17,14 @@ import PatientAssign from '../pages/patientAssign'
 import BedCreation from '../pages/bedAssign/bedCreation'
 import PatientUpdation from '../pages/Patient/patientUpdate'
 import StaffUpdation from '../pages/Staff/staffUpdate'
-
+import OrganizationUpdate from '../pages/organizationDetails/organizationUpdate'
 const SuperAdminRoutes = [ 
 
   { path: '/dashboard', component: <Dashboard /> },
   { path: '/access-control', component: <AccessControl /> },
   { path: '/organization-details', component: <Organization /> },
   {path:'/organization-form',component:<OrganizationForm/>},
-
+  {path:'/organization-update/:id',component:<OrganizationUpdate/>}
 ];
 
 const AdminRoutes = [

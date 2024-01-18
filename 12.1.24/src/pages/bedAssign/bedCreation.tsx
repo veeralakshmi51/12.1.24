@@ -25,7 +25,8 @@ const BedCreation = () => {
     available:true,
   });
 
-  const handleSave = async () => {if (!formData.roomNo || !formData.bedNo) {
+  const handleSave = async () => {
+    if (!formData.roomNo || !formData.bedNo) {
     alert("Please fill All The Fields");
     return;
   } console.log("Organization:", organization);

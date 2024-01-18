@@ -226,22 +226,16 @@ const Patient: React.FC = () => {
     <div className="container m5 p3" style={{ width: '90%' }}>
       {loading && <Loader />}
 
-      <div className="row mb-2">
-        <div className="col-md-5">
-          <div className="heading1">
-            <h4>All Patient List</h4>
-            <br />
-            </div>
-        </div>
-        <div className="col-md-4">
-          <div className="mx-2">
+      <div className="row ">
+        <div className="col-md-9">
+            <h2>All Patient List</h2>
             <FaPlus
               data-bs-target="#exampleModal"
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer",position:'absolute',fontSize:'20px' }}
               onClick={() => navigate("/patient-register")}
             />
-          </div>
-        </div>
+           
+         </div>
         <div className="col-md-3">
           <div className="mx-2 search-container">
             <input
@@ -255,6 +249,22 @@ const Patient: React.FC = () => {
         </div>
         </div>
         <br></br>
+        <hr></hr>
+        <Pagination className='d-flex justify-content-end '>
+          <Pagination.Prev
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          />
+
+          {renderPageNumbers()}
+
+          <Pagination.Next
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={
+              currentPage === Math.ceil(patientData.length / itemsPerPage)
+            }
+          />
+        </Pagination>
         <Table responsive bordered>
           <thead>
             <tr>
@@ -550,21 +560,7 @@ const Patient: React.FC = () => {
             </Button>
           </ModalFooter>
         </Modal> */} 
-        <Pagination className='d-flex justify-content-center align-items-center '>
-          <Pagination.Prev
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-          />
-
-          {renderPageNumbers()}
-
-          <Pagination.Next
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={
-              currentPage === Math.ceil(patientData.length / itemsPerPage)
-            }
-          />
-        </Pagination>
+        
       </div>
     // </div>
   );
