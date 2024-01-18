@@ -106,8 +106,29 @@ const Staff = () => {
     fetchDropdownData();
   }, []);
 
-  const handleSaveClick = async () => {
+  const handleSaveClick = async (e:React.FormEvent) => {
+    e.preventDefault();
     console.log(organization)
+    if(!formData.firstName ||
+    !formData.middleName ||
+    !formData.lastName ||
+    !formData.dateofBirth ||
+    !formData.ssn ||
+    !formData.npi ||
+    !formData.addressLine1 ||
+    !formData.addressLine2 ||
+    !formData.city ||
+    !formData.state ||
+    !formData.postalCode ||
+    !formData.mobilePhone ||
+    !formData.email ||
+    !formData.startDate ||
+    !formData.userType
+    )
+    {
+      alert("Please Fill All The Fields");
+      return;
+    }
     const requestBody = {
         id:"",
       resource: [

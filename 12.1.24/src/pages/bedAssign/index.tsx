@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaSearch } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../components/loader/Loader";
 import {
@@ -39,6 +39,7 @@ const BedAssign: React.FC = () => {
   const dispatch = useDispatch<any>();
   const [bedId, setBedId] = useState<string | null>(null);
   const [editModal, setEditModal] = useState(false);
+  const [search, setSearch] = useState("");
   const { bedAssignData = [], loading } = useSelector(
     (state: any) => state.BedAssign
   );
@@ -78,7 +79,7 @@ const BedAssign: React.FC = () => {
       );
 
       console.log("API bedassign Response:", response.data);
-     
+
       if (
         response.data.message &&
         response.data.message.code === "MHC - 0200"
@@ -100,9 +101,9 @@ const BedAssign: React.FC = () => {
 
   const handleClick = (selectedBed: any) => {
     if (selectedBed) {
-     // if (selectedBed.pid) {
-       // alert("This Bed Is already assigned");
-       // return;
+      // if (selectedBed.pid) {
+      // alert("This Bed Is already assigned");
+      // return;
       //}
       const bedAssignId = selectedBed.id || " ";
       setBedId(bedAssignId);
@@ -157,13 +158,13 @@ const BedAssign: React.FC = () => {
     setCurrentPage(selectedPage.selected);
   };
   return (
-    <div className="container m15 p3" style={{ width: '90%' }}>
+    <div className="container m15 p3" style={{ width: "90%" }}>
       <div className="row mb-2">
         <div className="col-md-8">
           <div className="heading1">
             <h4>All Bed Details</h4>
             <br />
-            </div>
+          </div>
         </div>
         <div className="col-md-4">
           <div className="mx-2">
@@ -174,24 +175,35 @@ const BedAssign: React.FC = () => {
             />
           </div>
         </div>
-        </div>
-        <hr></hr>
-    
+      </div>
+      <hr></hr>
+
       {loading ? (
         <Loader />
       ) : (
         <div>
-          <Row style={{display:'flex',flexWrap:'wrap'}}>
+          <Row style={{ display: "flex", flexWrap: "wrap" }}>
             {Array.isArray(bedAssignData) && bedAssignData.length > 0 ? (
               bedAssignData.map((bedassign: any, index: number) => (
                 <Col key={index}>
                   <div className="bed-assignment-box">
-                    <Card className="mb-3" color="primary" outline style={{width:'180px',height:'180px',padding:'5px',margin:'5px',justifyContent:"flex-start"}}>
+                    <Card
+                      className="mb-3"
+                      color="primary"
+                      outline
+                      style={{
+                        width: "180px",
+                        height: "180px",
+                        padding: "5px",
+                        margin: "5px",
+                        justifyContent: "flex-start",
+                      }}
+                    >
                       <CardBody
                         key={index}
                         className="mb-2"
                         onClick={() => handleClick(bedassign)}
-                        style={{cursor:'pointer'}}
+                        style={{ cursor: "pointer" }}
                       >
                         <CardTitle tag="h6">
                           RoomNo: {bedassign.roomNo}
@@ -210,9 +222,9 @@ const BedAssign: React.FC = () => {
                         </Badge>
                         <FontAwesomeIcon
                           icon={faTrash}
-                          className="text-danger outline"                          
+                          className="text-danger outline"
                           onClick={() => handleDelete(bedassign.id)}
-                          style={{ cursor: "pointer",marginLeft:'40%'}}
+                          style={{ cursor: "pointer", marginLeft: "40%" }}
                         />
                       </CardFooter>
                     </Card>
@@ -240,13 +252,22 @@ const BedAssign: React.FC = () => {
         <ModalHeader toggle={() => setEditModal(false)}>Assign Bed</ModalHeader>
         <ModalBody>
           <div>
+            {/* <div className="mx-2 search-container">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="search"
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <FaSearch className="search-icon" />
+            </div> */}
             <div className="form-control">
               <label
                 htmlFor="patientId"
                 className="floating-label"
                 style={{ fontWeight: "bold" }}
               >
-                Patient ID
+                Patient Name
               </label>
               <Input
                 type="select"
@@ -256,12 +277,18 @@ const BedAssign: React.FC = () => {
                 onChange={(e) => handlePatientChange(e.target.value)}
               >
                 <option value="">Select Patient</option>
-                {patients.map((patient) => (
-                  <option key={patient.id} value={patient.id}>
-                    {patient.basicDetails[0].name[0].given}{" "}
-                    {patient.basicDetails[0].name[0].family}
-                  </option>
-                ))}
+                {patients
+                  .filter((patient: any) =>
+                    patient.basicDetails[0].name[0].given
+                      .toLowerCase()
+                      .includes(search.toLowerCase())
+                  )
+                  .map((patient) => (
+                    <option key={patient.id} value={patient.id}>
+                      {patient.basicDetails[0].name[0].given}{" "}
+                      {patient.basicDetails[0].name[0].family}
+                    </option>
+                  ))}
               </Input>
             </div>
           </div>

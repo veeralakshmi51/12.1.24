@@ -96,8 +96,28 @@ const PatientCreation: React.FC = () => {
     fetchDropdownData();
   }, []);
 
-  const handleSaveClick = async () => {
+  const handleSaveClick = async (e:React.FormEvent) => {
+    e.preventDefault();
+    if(!formValues.firstName||
+      !formValues.middleName ||
+      !formValues.lastName ||
+      !formValues.birthDate ||
+      !formValues.ssn ||
+      !formValues.addressLine1 ||
+      !formValues.addressLine2 ||
+      !formValues.city ||
+      !formValues.state ||
+      !formValues.postalCode ||
+      !formValues.mrNumber ||
+      !formValues.email ||
+      !formValues.deviceId 
+      )
+      {
+        alert('Please Fill All The Fields');
+        return;
+      }
     console.log("Organization:", organization);
+
     const requestBody = {
         id: "",
         active: "",
