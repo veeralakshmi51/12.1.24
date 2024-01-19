@@ -254,13 +254,16 @@ const Organization: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {records
+        {records
             .filter((organization: any) =>
-              organization.organizationdetails?.[0]?.name
-                .toLowerCase()
-                .includes(search.toLowerCase()) ||
-                organization.organizationdetails?.[0]?.type.toLowerCase().includes(search.toLowerCase())||
-                organization.hippaprivacyofficer[0]?.name.toLowerCase().includes(search.toLowerCase())
+              Object.values(organization.organizationdetails?.[0] || {})
+                .some((value) =>
+                  String(value).toLowerCase().includes(search.toLowerCase())
+                ) ||
+              organization.hippaprivacyofficer
+                .some((officer: any) =>
+                  String(officer.name).toLowerCase().includes(search.toLowerCase())
+                )
             )
             .map((organization: any, index: number) => (
               <tr key={index}>

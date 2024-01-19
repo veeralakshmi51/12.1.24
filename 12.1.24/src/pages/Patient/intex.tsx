@@ -4,20 +4,16 @@ import { useNavigate } from "react-router-dom";
 import {
   getAllPatient,
   updatePatientDetails,
-  deletePatientDetails,
+  patientDischarge,
+  getAllBed,
 } from "../../slices/thunk";
 import { FaPlus } from "react-icons/fa";
 import { Pagination } from "react-bootstrap";
-import 
-{
-  Table,
-} from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import "react-toastify/dist/ReactToastify.css";
+import { Table } from "reactstrap";
 import Loader from "../../components/loader/Loader";
 import { toast } from "react-toastify";
 import { FaSearch } from "react-icons/fa";
+import Button from '@mui/material/Button';
 interface FormData {
   firstName: string;
   middleName: string;
@@ -35,23 +31,31 @@ interface FormData {
   gender: string;
   country: string;
   id: string;
-  active:string;
-
+  active: string;
+  assignedBed: string;
 }
 
+interface Bed{
+  id:string;
+  roomNo:string;
+  bedNo:string;
+}
 const Patient: React.FC = () => {
-  const [search,setSearch]=useState("");
+  const [search, setSearch] = useState("");
   const dispatch = useDispatch<any>();
   const [selectPatientId, setSelectPatientId] = useState<string | null>(null);
   const [editModal, setEditModal] = useState(false);
   const { patientData, loading } = useSelector((state: any) => state.Patient);
+  console.log('patient data:',patientData);
+  const { bedAssignData } = useSelector((state: any) => state.BedAssign);
+  console.log('bed assign data:',bedAssignData);
   const { organization } = useSelector((state: any) => state.Login);
   const navigate = useNavigate();
   const itemsPerPage = 8;
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState<FormData>({
-    id:'',
-    active:"",
+    id: "",
+    active: "",
     firstName: "",
     middleName: "",
     lastName: "",
@@ -67,15 +71,28 @@ const Patient: React.FC = () => {
     beaconDevice: "",
     gender: "",
     country: "",
+    assignedBed: "",
   });
-
+const [bedData,setBedData]=useState<Bed>({
+  id:"",
+  roomNo:"",
+  bedNo:"",
+})
   useEffect(() => {
     getAllPatient(dispatch, organization);
   }, [dispatch, organization]);
+
+  useEffect(()=>{
+    getAllBed(dispatch,organization);
+  },[dispatch,organization])
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentPatientData =
-    patientData && patientData?.slice(indexOfFirstItem, indexOfLastItem);
+    Array.isArray(patientData) &&
+    patientData?.slice(indexOfFirstItem, indexOfLastItem);
+  const currentPatientDataArray = Array.isArray(currentPatientData)
+    ? currentPatientData
+    : [];
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
   const renderPageNumbers = () => {
@@ -210,32 +227,54 @@ const Patient: React.FC = () => {
   //     console.error("Invalid patient data:", selectedPatient);
   //   }
   // };
-  const handleDelete = async (username: string) => {
-    const confirmDelete = window.confirm("Are You Sure Do You Want To Delete?");
+  // const handleDischarge = async (id: string) => {
+  //   const confirmDelete = window.confirm("Are You Sure Do You Want to Discharge?");
+  //   if (confirmDelete) {
+  //     try {
+  //       await dispatch(patientDischarge(id, organization));
+  //       toast.success("Patient Discharged Successfully");
+  //     } catch {
+  //       toast.error("Failed to Delete Patient Details");
+  //     }
+  //   }
+  // };
+  const handleDischarge = async (id: string) => {
+    const confirmDelete = window.confirm(
+      "Are You Sure Do You Want to Discharge?"
+    );
     if (confirmDelete) {
       try {
-        await dispatch(deletePatientDetails(username, organization));
-        toast.success("Patient Details Deleted Successfully");
+        await patientDischarge(dispatch, id, organization);
+        alert("Patient Discharged Successfully"); 
+        window.location.reload();
+        navigate("/patient-table");
       } catch {
         toast.error("Failed to Delete Patient Details");
       }
     }
   };
 
+
+const getRoomNo=(bedId:string)=>{
+console.log(bedAssignData);
+}
   return (
-    <div className="container m5 p3" style={{ width: '90%' }}>
+    <div className="container m5 p3" style={{ width: "90%" }}>
       {loading && <Loader />}
 
       <div className="row ">
         <div className="col-md-9">
-            <h2>All Patient List</h2>
-            <FaPlus
-              data-bs-target="#exampleModal"
-              style={{ cursor: "pointer",position:'absolute',fontSize:'20px' }}
-              onClick={() => navigate("/patient-register")}
-            />
-           
-         </div>
+          <h2>All Patient List</h2>
+          <FaPlus
+            data-bs-target="#exampleModal"
+            style={{
+              cursor: "pointer",
+              position: "absolute",
+              fontSize: "20px",
+            }}
+            onClick={() => navigate("/patient-register")}
+          />
+        </div>
         <div className="col-md-3">
           <div className="mx-2 search-container">
             <input
@@ -244,76 +283,117 @@ const Patient: React.FC = () => {
               className="search"
               onChange={(e) => setSearch(e.target.value)}
             />
-             <FaSearch className="search-icon" />
+            <FaSearch className="search-icon" />
           </div>
         </div>
-        </div>
-        <br></br>
-        <hr></hr>
-        <Pagination className='d-flex justify-content-end '>
-          <Pagination.Prev
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-          />
+      </div>
+      <br></br>
+      <hr></hr>
+      <Pagination className="d-flex justify-content-end ">
+        <Pagination.Prev
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+        />
 
-          {renderPageNumbers()}
+        {renderPageNumbers()}
 
-          <Pagination.Next
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={
-              currentPage === Math.ceil(patientData.length / itemsPerPage)
-            }
-          />
-        </Pagination>
-        <Table responsive bordered>
-          <thead>
-            <tr>
-              <th scope="col" className="text-center">S.No</th>
-              <th scope="col" className="text-center">patient Name</th>
-              <th scope="col" className="text-center">patient ID</th>
-              <th scope="col" className="text-center">Date of Birth</th>
-              <th scope="col" className="text-center">Email</th>
-              <th scope="col" className="text-center">SSN</th>
-              <th scope="col" className="text-center">Beacon Device</th>
-              {/* <th scope="col">Gender</th> */}
-              <th scope="col" className="text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentPatientData.filter((patient:any)=>patient.basicDetails[0].name[0].given.toLowerCase().includes(search.toLowerCase())||
-            patient.basicDetails[0].birthDate.toString().includes(search)||
-            patient.basicDetails[0].ssn.toString().includes(search)||
-            patient.email.toLowerCase().includes(search.toLowerCase)).map((patient: any,index:number) => (
+        <Pagination.Next
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={
+            currentPage === Math.ceil(patientData.length / itemsPerPage)
+          }
+        />
+      </Pagination>
+      <Table responsive bordered>
+        <thead>
+          <tr>
+            <th scope="col" className="text-center">
+              S.No
+            </th>
+            <th scope="col" className="text-center">
+              patient Name
+            </th>
+            {/* <th scope="col" className="text-center">patient ID</th> */}
+            <th scope="col" className="text-center">
+              Date of Birth
+            </th>
+            <th scope="col" className="text-center">
+              Email
+            </th>
+            <th scope="col" className="text-center">
+              SSN
+            </th>
+            <th scope="col" className="text-center">
+              Room No
+            </th>
+            <th scope="col" className="text-center">
+              Bed No
+            </th>
+            <th scope="col" className="text-center">
+              Beacon Device
+            </th>
+            {/* <th scope="col">Gender</th> */}
+            <th scope="col" className="text-center">
+              Action
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentPatientDataArray  //patientData
+            .filter(
+              (patient: any) =>
+                patient.basicDetails[0].name[0].given
+                  .toLowerCase()
+                  .includes(search.toLowerCase()) ||
+                patient.basicDetails[0].birthDate.toString().includes(search) ||
+                patient.basicDetails[0].ssn.toString().includes(search) ||
+                patient.email.toLowerCase().includes(search.toLowerCase)
+            )
+            .map((patient: any, index: number) => (
               <tr key={index}>
-                <td className="text-center">{index+1}</td>
-                <td className="text-center"
+                <td className="text-center">{index + 1}</td>
+                <td
+                  className="text-center"
                   style={{ cursor: "pointer" }}
-                  onClick={() => navigate(`/patient-update/${patient.id}`,{state:patient})}
+                  onClick={() =>
+                    navigate(`/patient-update/${patient.id}`, {
+                      state: patient,
+                    })
+                  }
                 >
                   {patient.basicDetails[0].name[0].given}{" "}
                   {patient.basicDetails[0].name[0].family}
                 </td>
-                <td className="text-center">{patient.id}</td>
-                <td className="text-center">{patient.basicDetails[0].birthDate}</td>
+                {/* <td className="text-center">{patient.id}</td> */}
+                <td className="text-center">
+                  {patient.basicDetails[0].birthDate}
+                </td>
                 <td className="text-center">{patient.email}</td>
                 <td className="text-center">{patient.basicDetails[0].ssn}</td>
-
+                <td className="text-center">{patient.bedAssignData?.roomNo}</td>
+                <td className="text-center">{patient.bedAssignData?.bedNo}</td>
                 <td className="text-center">{patient.beaconDevice}</td>
 
                 {/* <td>{patient.basicDetails[0].gender}</td> */}
-               <td className="text-center">
-                  <FontAwesomeIcon
-                    icon={faTrash}
-                    className="text-danger"
-                    onClick={() => handleDelete(patient.username)}
+                <td className="text-center">
+                  <Button
+                    onClick={() => handleDischarge(patient.id)}
+                   variant="contained" color="success">
+                    In Active
+                    </Button>
+                    {/* <FontAwesomeIcon
+                    icon={faUserSlash}
+                    className="text-dark"
+                    onClick={() => handleDischarge(patient.id)}
                     style={{ cursor: "pointer" }}
-                  />
+                  /> */}
+                  
                 </td>
               </tr>
             ))}
-          </tbody>
-        </Table>
-        {/* <Modal isOpen={editModal} toggle={() => setEditModal(false)} centered>
+        </tbody>
+      </Table>
+      {/* <Modal isOpen={editModal} toggle={() => setEditModal(false)} centered>
           <ModalHeader toggle={() => setEditModal(false)}>
             <h3>Patient Details</h3>
           </ModalHeader>
@@ -380,7 +460,7 @@ const Patient: React.FC = () => {
                   value={formData.email}
                   onChange={handleChange}
                 /> */}
-                {/* <label
+      {/* <label
                   htmlFor="ssn"
                   className="floating-label"
                   style={{ fontWeight: "bold" }}
@@ -395,7 +475,7 @@ const Patient: React.FC = () => {
                   value={formData.ssn}
                   onChange={handleChange}
                 /> */}
-                {/* <label
+      {/* <label
                   htmlFor="mrNumber"
                   className="floating-label"
                   style={{ fontWeight: "bold" }}
@@ -411,7 +491,7 @@ const Patient: React.FC = () => {
                   onChange={handleChange}
                 /> */}
 
-                {/* <label
+      {/* <label
                   htmlFor="gender"
                   className="floating-label"
                   style={{ fontWeight: "bold" }}
@@ -426,7 +506,7 @@ const Patient: React.FC = () => {
                   value={formData.gender}
                   onChange={handleChange}
                 /> */}
-                {/* <label
+      {/* <label
                   htmlFor="birthDate"
                   className="floating-label"
                   style={{ fontWeight: "bold" }}
@@ -441,7 +521,7 @@ const Patient: React.FC = () => {
                   value={formData.birthDate}
                   onChange={handleChange}
                 /> */}
-                {/* <label
+      {/* <label
                   htmlFor="addressLine1"
                   className="floating-label"
                   style={{ fontWeight: "bold" }}
@@ -559,9 +639,8 @@ const Patient: React.FC = () => {
               Cancel
             </Button>
           </ModalFooter>
-        </Modal> */} 
-        
-      </div>
+        </Modal> */}
+    </div>
     // </div>
   );
 };

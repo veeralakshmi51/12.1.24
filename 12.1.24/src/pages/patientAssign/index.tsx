@@ -6,7 +6,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../components/loader/Loader";
-import { getAllBed,deletePatientAssignDetails } from "../../slices/patientAssign/thunk";
+import {
+  getAllBed,
+  deletePatientAssignDetails,
+} from "../../slices/patientAssign/thunk";
 import ReactPaginate from "react-paginate";
 import {
   Card,
@@ -17,8 +20,10 @@ import {
   Row,
   CardFooter,
   Badge,
-  CardHeader
+  CardHeader,
 } from "reactstrap";
+
+
 
 const PatientAssign: React.FC = () => {
   const dispatch = useDispatch<any>();
@@ -27,21 +32,19 @@ const PatientAssign: React.FC = () => {
   );
   const { organization } = useSelector((state: any) => state.Login);
   const { patientData } = useSelector((state: any) => state.Patient);
-  const { bedAssignData = []} = useSelector(
-    (state: any) => state.BedAssign
-  ); 
-  console.log('bedassigndata',bedAssignData)
+  const { bedAssignData = [] } = useSelector((state: any) => state.BedAssign);
+  console.log("bedassigndata", bedAssignData);
   console.log("Redux Patient Data:", patientData);
-  console.log("patient assigned data:",patientAssignData)
+  console.log("patient assigned data:", patientAssignData);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [perPage] = useState(10);
-  const [totalItems, setTotalItems] = useState(0); 
+  const [totalItems, setTotalItems] = useState(0);
   const totalPages = Math.ceil(totalItems / perPage);
   const navigate = useNavigate();
   const selectedPatientId = patientData?.id;
- console.log(selectedPatientId);
- useEffect(() => {
+  console.log(selectedPatientId);
+  useEffect(() => {
     getAllBed(dispatch, organization);
   }, [dispatch, organization]);
   const handlePageClick = (selectedPage: { selected: number }) => {
@@ -59,51 +62,65 @@ const PatientAssign: React.FC = () => {
       }
     }
   };
-// const getBedNo=(bedId:string)=>{
-//   console.log("Bed Assign Data:",bedAssignData);
-//   const selectBed=bedAssignData.find((bed:any)=>bed.id=bedId);
-//   console.log("Select Bed:",selectBed);
-//   if(selectBed){
-//     if(selectBed.bedNo && selectBed.bedNo.length>0){
-//       const {bedNo}=selectBed.bedNo;
-//       console.log("bedNo:",bedNo);
-//       return bedNo;
-//     }
-//   }
-// }
-  const getPatientName = (patientId: string) => {
-    console.log("patientData:", patientData);
+ 
   
-    const selectedPatient = patientData.find((patient: any) => patient.id === patientId);
   
-    console.log("selectedPatient:", selectedPatient);
+  const getBedNo = (bedId: string) => {
+    console.log("Bed Assign Data:", bedAssignData);
+    
+    const selectBed = bedAssignData.find((bed: any) => bed.bedId === bedId);
   
-    if (selectedPatient) {
-      if (selectedPatient.name && selectedPatient.name.length > 0) {
-        const { family, given } = selectedPatient.name[0];
-        const fullName = `${given} ${family}`;
-        
-        console.log("patientName:", fullName);
-        return fullName;
-      } else if (selectedPatient.basicDetails && selectedPatient.basicDetails.length > 0) {
-        const { family, given } = selectedPatient.basicDetails[0].name[0];
-        const fullName = `${given} ${family}`;
-         console.log("patientName (using basicDetails):", fullName);
-        return fullName;
-      }
+    console.log("Select Bed:", selectBed);
+  
+    if (selectBed && selectBed.bedNo !== null) {
+      console.log("bedNo:", selectBed.bedNo);
+      return selectBed.bedNo;
+    } else if (selectBed && selectBed.bedNo === null) {
+      console.log("Bed number is initially null for bedId:", bedId);
+      return "Not Assigned";
     }
- console.warn(`Patient data issue for ID: ${patientId}`, selectedPatient);
+  
+    console.log("Bed number is unknown. Check the structure of selectBed and bedAssignData.");
     return "Unknown";
   };
   
   
+
+  const getPatientName = (patientId: string) => {
+    console.log("patientData:", patientData);
+
+    const selectedPatient = patientData.find(
+      (patient: any) => patient.id === patientId
+    );
+
+    console.log("selectedPatient:", selectedPatient);
+
+    if (selectedPatient) {
+      if (selectedPatient.name && selectedPatient.name.length > 0) {
+        const { family, given } = selectedPatient.name[0];
+        const fullName = `${given} ${family}`;
+
+        console.log("patientName:", fullName);
+        return fullName;
+      } else if (
+        selectedPatient.basicDetails &&
+        selectedPatient.basicDetails.length > 0
+      ) {
+        const { family, given } = selectedPatient.basicDetails[0].name[0];
+        const fullName = `${given} ${family}`;
+        console.log("patientName (using basicDetails):", fullName);
+        return fullName;
+      }
+    }
+    console.warn(`Patient data issue for ID: ${patientId}`, selectedPatient);
+    return "Unknown";
+  };
+
   return (
-    <div className="container m15 p3" style={{ width: '90%' }}>
-      
-      
-        <h2 className="m-0 " >All Bed Assigned List</h2>
-        <hr></hr>
-      
+    <div className="container m15 p3" style={{ width: "90%" }}>
+      <h2 className="m-0 ">All Bed Assigned List</h2>
+      <hr></hr>
+
       {loading ? (
         <Loader />
       ) : (
@@ -112,30 +129,42 @@ const PatientAssign: React.FC = () => {
             patientAssignData.map((patientassign: any, index: number) => (
               <Col key={patientassign.id}>
                 <div className="bed-assignment-box">
-                  <Card className="mb-3" color="danger" outline style={{width:'220px',height:'220px'}}>
-                  <CardHeader tag="h6">Patient Name: {getPatientName(patientassign.pid)}</CardHeader>
-                  <CardBody>
-                      <CardTitle tag="h6">Patient ID: {patientassign.pid}</CardTitle>
+                  <Card
+                    className="mb-3"
+                    color="danger"
+                    outline
+                    style={{ width: "220px", height: "220px" }}
+                  >
+                    <CardHeader tag="h6">
+                      Patient Name: {getPatientName(patientassign.pid)}
+                    </CardHeader>
+                    <CardBody>
+                      <CardTitle tag="h6">
+                        Patient ID: {patientassign.pid}
+                      </CardTitle>
                       <CardSubtitle tag="h6" className="mb-2 text-muted">
                         BedID: {patientassign.bedId}
                       </CardSubtitle>
+                      {/* <CardSubtitle tag="h6" className="mb-2 text-muted">
+                        BedNo: {patientassign.bedNo}
+                      </CardSubtitle> */}
                     </CardBody>
-                    
-                      <CardFooter>
-                        <Badge
-                          color={patientassign.pid ? "danger" : "success"}
-                          tag="h4"
-                        >
-                          {patientassign.pid ? "Not Available" : "Available"}
-                        </Badge>
-                        <FontAwesomeIcon
-                    icon={faTrash}
-                    className="text-danger" 
-                    onClick={() => handleDelete(patientassign.id)}
-                    style={{ cursor: "pointer",marginLeft:'40px' }}
-                  />
-                </CardFooter>
-                      </Card>
+
+                    <CardFooter>
+                      <Badge
+                        color={patientassign.pid ? "danger" : "success"}
+                        tag="h4"
+                      >
+                        {patientassign.pid ? "Not Available" : "Available"}
+                      </Badge>
+                      <FontAwesomeIcon
+                        icon={faTrash}
+                        className="text-danger"
+                        onClick={() => handleDelete(patientassign.id)}
+                        style={{ cursor: "pointer", marginLeft: "40px" }}
+                      />
+                    </CardFooter>
+                  </Card>
                 </div>
               </Col>
             ))
@@ -143,21 +172,20 @@ const PatientAssign: React.FC = () => {
             <p>No bed assignments available.</p>
           )}
         </Row>
-        
       )}
-     <ReactPaginate
-            previousLabel={"← Previous"}
-            nextLabel={"Next →"}
-            breakLabel={"..."}
-            pageCount={totalPages}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={5}
-            onPageChange={handlePageClick}
-            containerClassName={"pagination"}
-            activeClassName={"active"}
-          />
+      <ReactPaginate
+        previousLabel={"← Previous"}
+        nextLabel={"Next →"}
+        breakLabel={"..."}
+        pageCount={totalPages}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={handlePageClick}
+        containerClassName={"pagination"}
+        activeClassName={"active"}
+      />
     </div>
   );
 };
 
-export default PatientAssign
+export default PatientAssign;

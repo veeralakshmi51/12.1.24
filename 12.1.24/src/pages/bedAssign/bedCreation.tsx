@@ -29,7 +29,20 @@ const BedCreation = () => {
     if (!formData.roomNo || !formData.bedNo) {
     alert("Please fill All The Fields");
     return;
-  } console.log("Organization:", organization);
+  } 
+  // try{
+  //   const oldBedsResponse= await axios.get("http://47.32.254.89:7000/api/Q15Bed/getAll");
+  //   const oldBeds=oldBedsResponse.data.data;
+  //   const isDuplicate=oldBeds.some((bed:FormData)=>bed.roomNo===formData.roomNo && bed.bedNo===formData.bedNo);
+  //   if(isDuplicate){
+  //     alert('Bed with the same Room No and Bed No already exists!!!');
+  //     return;
+  //   }
+  // }catch(error){
+  //   console.log(error)
+  // }
+  
+  console.log("Organization:", organization);
     const requestBody = {
       id: "",
       roomNo: formData.roomNo,
@@ -51,13 +64,13 @@ const BedCreation = () => {
       ) 
       { 
         alert(response.data.message.description);
-        navigate(`/bed-table`); 
+        navigate(`/management/bed-table`); 
       } else {
         console.log("error:", response.data.message);
         alert(`Error:${response.data.message.description}`);
       }
     } catch (error) {
-      console.log("Error:", error);
+      alert("Room No and Bed No Already Exists");
     }
   };
   return (
@@ -78,7 +91,7 @@ const BedCreation = () => {
         </div>
         
       <div className="d-flex gap-3 justify-content-end mt-4">
-          <Button label="Cancel" onClick={() => { navigate('/bed-table') }} severity="secondary" style={{ color: '#000', backgroundColor: '#fff', border: '2px solid #0f3995' }} />
+          <Button label="Cancel" onClick={() => { navigate('/management/bed-table') }} severity="secondary" style={{ color: '#000', backgroundColor: '#fff', border: '2px solid #0f3995' }} />
           <Button label="Save" style={{ backgroundColor: '#0f3995' }} onClick={handleSave} />
         </div>
       </div>

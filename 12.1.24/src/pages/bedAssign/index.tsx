@@ -25,6 +25,7 @@ import {
   CardFooter,
   Badge,
   Input,
+  Button
 } from "reactstrap";
 import ReactPaginate from "react-paginate";
 import "./bedassign.css";
@@ -34,11 +35,18 @@ interface FormData {
   pid: string;
   orgId: string;
 }
-
+interface Bed {
+  id: string;
+  roomNo: string;
+  bedNo: string;
+   orgId: string,
+   available:boolean,
+}
 const BedAssign: React.FC = () => {
   const dispatch = useDispatch<any>();
   const [bedId, setBedId] = useState<string | null>(null);
   const [editModal, setEditModal] = useState(false);
+  const [showModal,setShowModal]=useState(false);
   const [search, setSearch] = useState("");
   const { bedAssignData = [], loading } = useSelector(
     (state: any) => state.BedAssign
@@ -62,7 +70,13 @@ const BedAssign: React.FC = () => {
   const handlePatientChange = (selectedPatientId: string) => {
     setBedAssignedData((prevData) => ({ ...prevData, pid: selectedPatientId }));
   };
-
+  const [formData, setFormData] = useState<Bed>({
+    id: "",
+    roomNo: "",
+    bedNo: "",
+    orgId:organization,
+    available:true,
+  });
   const handleSave = async () => {
     const requestBody = {
       bedId: bedId,
@@ -141,7 +155,7 @@ const BedAssign: React.FC = () => {
   useEffect(() => {
     getAllBedAssign(dispatch, organization);
     fetchPatients();
-  }, [dispatch, organization]);
+  }, [dispatch, organization, bedAssignedData]);
 
   const handleDelete = async (id: string) => {
     const confirmDelete = window.confirm("Are You Sure Do You Want To Delete?");
@@ -157,6 +171,51 @@ const BedAssign: React.FC = () => {
   const handlePageClick = (selectedPage: { selected: number }) => {
     setCurrentPage(selectedPage.selected);
   };
+
+const handlePatientClick=(e:React.FormEvent)=>{
+  e.preventDefault();
+  setShowModal(!showModal)
+}
+  
+  const handleSaveBed = async () => {
+    if (!formData.roomNo || !formData.bedNo) {
+    alert("Please fill All The Fields");
+    return;
+  } 
+   
+  console.log("Organization:", organization);
+    const requestBody = {
+      id: "",
+      roomNo: formData.roomNo,
+      bedNo: formData.bedNo,
+      orgId:formData.orgId,
+      available:formData.available
+    };
+    try {
+      const response = await axios.post(
+        "http://47.32.254.89:7000/api/Q15Bed/create",
+        requestBody
+      );
+      console.log("Registered Data:", response.data);
+      console.log("Request details:", requestBody);
+      console.log('ID:',response.data.data.id)
+      if (
+        response.data.message &&
+        response.data.message.code === "MHC - 0200"
+      ) 
+      { 
+        alert(response.data.message.description);
+        setEditModal(false);
+        window.location.reload();
+      } else {
+        console.log("error:", response.data.message);
+        alert(`Error:${response.data.message.description}`);
+      }
+    } catch (error) {
+      alert("Room No and Bed No Already Exists");
+    }
+  };
+ 
   return (
     <div className="container m15 p3" style={{ width: "90%" }}>
       <div className="row mb-2">
@@ -171,7 +230,8 @@ const BedAssign: React.FC = () => {
             <FaPlus
               data-bs-target="#exampleModal"
               style={{ cursor: "pointer" }}
-              onClick={() => navigate("/bed-assign")}
+              // onClick={() => navigate("/management/bed-assign")}
+              onClick={handlePatientClick}
             />
           </div>
         </div>
@@ -249,7 +309,7 @@ const BedAssign: React.FC = () => {
         </div>
       )}
       <Modal isOpen={editModal} toggle={() => setEditModal(false)}>
-        <ModalHeader toggle={() => setEditModal(false)}>Assign Bed</ModalHeader>
+        <ModalHeader toggle={() => setEditModal(false)}>Assign Bed For Patient</ModalHeader>
         <ModalBody>
           <div>
             {/* <div className="mx-2 search-container">
@@ -263,7 +323,7 @@ const BedAssign: React.FC = () => {
             </div> */}
             <div className="form-control">
               <label
-                htmlFor="patientId"
+                htmlFor="patientName"
                 className="floating-label"
                 style={{ fontWeight: "bold" }}
               >
@@ -271,7 +331,7 @@ const BedAssign: React.FC = () => {
               </label>
               <Input
                 type="select"
-                id="patientId"
+                id="patientName"
                 name="pid"
                 value={bedAssignedData.pid}
                 onChange={(e) => handlePatientChange(e.target.value)}
@@ -282,8 +342,8 @@ const BedAssign: React.FC = () => {
                     patient.basicDetails[0].name[0].given
                       .toLowerCase()
                       .includes(search.toLowerCase())
-                  )
-                  .map((patient) => (
+                   || patientData.basicDetails[0].name[0].family.toLowerCase().includes(search.toLowerCase()))
+                  .map((patient:any) => (
                     <option key={patient.id} value={patient.id}>
                       {patient.basicDetails[0].name[0].given}{" "}
                       {patient.basicDetails[0].name[0].family}
@@ -304,6 +364,55 @@ const BedAssign: React.FC = () => {
             Cancel
           </button>
         </ModalFooter>
+      </Modal>
+      <Modal isOpen={showModal} toggle={() => setShowModal(false)} centered>
+        <ModalHeader toggle={() => setShowModal(false)}>
+          <h3>Bed Assign Details</h3>
+        </ModalHeader>
+        <ModalBody>
+          <div>
+            <div className="form-control">
+              <label
+                htmlFor="roomNo"
+                className="floating-label"
+                style={{ fontWeight: "bold" }}
+              >
+                Room No:
+              </label>
+              <input
+                type="text"
+                id="roomNo"
+                name="roomNo"
+                placeholder="Enter Room No"
+                value={formData.roomNo}
+                onChange={(e) => setFormData({ ...formData, roomNo: e.target.value })}
+              ></input>
+              <label
+                htmlFor="bedNo"
+                className="floating-label"
+                style={{ fontWeight: "bold" }}
+              >
+                Bed No:
+              </label>
+              <input
+                type="text"
+                id="bedNo"
+                name="bedNo"
+                placeholder="Enter Bed No"
+                value={formData.bedNo}
+                onChange={(e) => setFormData({ ...formData, bedNo: e.target.value })}
+              ></input>
+              <ModalFooter>
+            <Button color="info" onClick={handleSaveBed}>
+              Save Changes
+            </Button>{" "}
+            <Button color="danger" onClick={() => setShowModal(false)}>
+              Cancel
+            </Button>
+          </ModalFooter>
+            </div>
+          </div>
+        </ModalBody>
       </Modal>
     </div>
   );
