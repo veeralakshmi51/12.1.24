@@ -64,6 +64,7 @@ const Staff = () => {
     country: [],
     roles: [],
     speciality: [],
+    state:[],
   });
   const handleChange = (event: SelectChangeEvent) => {
     setUserType(event.target.value as string);
@@ -109,26 +110,27 @@ const Staff = () => {
   const handleSaveClick = async (e:React.FormEvent) => {
     e.preventDefault();
     console.log(organization)
-    if(!formData.firstName ||
-    !formData.middleName ||
-    !formData.lastName ||
-    !formData.dateofBirth ||
-    !formData.ssn ||
-    !formData.npi ||
-    !formData.addressLine1 ||
-    !formData.addressLine2 ||
-    !formData.city ||
-    !formData.state ||
-    !formData.postalCode ||
-    !formData.mobilePhone ||
-    !formData.email ||
-    !formData.startDate ||
-    !formData.userType
-    )
-    {
-      alert("Please Fill All The Fields");
-      return;
-    }
+    console.log('Form Data,',formData)
+    // if(!formData.firstName ||
+    // !formData.middleName ||
+    // !formData.lastName ||
+    // !formData.dateofBirth ||
+    // !formData.ssn ||
+    // !formData.npi ||
+    // !formData.addressLine1 ||
+    // !formData.addressLine2 ||
+    // !formData.city ||
+    // !formData.state ||
+    // !formData.postalCode ||
+    // !formData.mobilePhone ||
+    // !formData.email ||
+    // !formData.startDate ||
+    // !formData.userType
+    // )
+    // {
+    //   alert("Please Fill All The Fields");
+    //   return;
+    // }
     const requestBody = {
         id:"",
       resource: [
@@ -186,6 +188,7 @@ const Staff = () => {
     country: false,
     roles: false,
     speciality: false,
+    state:false,
   });
 
   const handleSelectChange = (e: React.ChangeEvent<{ value: unknown }>, dropdownName: string) => {
@@ -307,7 +310,7 @@ const Staff = () => {
         <TextField id="outlined-basic-1" label="City" variant="outlined" fullWidth onChange={(e) => setFormData({ ...formData, city: e.target.value })}/>
       </div>
       <div className='col-md-4 mb-2'>
-        <TextField id="outlined-basic-2" label="State/Provide" variant="outlined" fullWidth onChange={(e) => setFormData({ ...formData, state: e.target.value })}/>
+        {renderDropdown('state')}
       </div>
       <div className='col-md-4 mb-2'>
         <TextField id="outlined-basic-3" label="Zip/Postal Code" variant="outlined" fullWidth onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}/>

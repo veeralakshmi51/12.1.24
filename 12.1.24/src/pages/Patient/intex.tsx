@@ -32,14 +32,11 @@ interface FormData {
   country: string;
   id: string;
   active: string;
-  assignedBed: string;
+  bedNo:string;
+  roomNo:string;
 }
 
-interface Bed{
-  id:string;
-  roomNo:string;
-  bedNo:string;
-}
+
 const Patient: React.FC = () => {
   const [search, setSearch] = useState("");
   const dispatch = useDispatch<any>();
@@ -47,7 +44,7 @@ const Patient: React.FC = () => {
   const [editModal, setEditModal] = useState(false);
   const { patientData, loading } = useSelector((state: any) => state.Patient);
   console.log('patient data:',patientData);
-  const { bedAssignData } = useSelector((state: any) => state.BedAssign);
+  const { bedAssignData=[]} = useSelector((state: any) => state.BedAssign);
   console.log('bed assign data:',bedAssignData);
   const { organization } = useSelector((state: any) => state.Login);
   const navigate = useNavigate();
@@ -71,20 +68,21 @@ const Patient: React.FC = () => {
     beaconDevice: "",
     gender: "",
     country: "",
-    assignedBed: "",
+    bedNo:"",
+    roomNo:"",
   });
-const [bedData,setBedData]=useState<Bed>({
-  id:"",
-  roomNo:"",
-  bedNo:"",
-})
-  useEffect(() => {
-    getAllPatient(dispatch, organization);
-  }, [dispatch, organization]);
 
-  useEffect(()=>{
-    getAllBed(dispatch,organization);
-  },[dispatch,organization])
+useEffect(() => {
+  const fetchData = async () => {
+    await getAllPatient(dispatch, organization);
+  };
+
+  fetchData();
+}, [dispatch, organization,bedAssignData]);
+
+
+
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentPatientData =
@@ -255,9 +253,7 @@ const [bedData,setBedData]=useState<Bed>({
   };
 
 
-const getRoomNo=(bedId:string)=>{
-console.log(bedAssignData);
-}
+
   return (
     <div className="container m5 p3" style={{ width: "90%" }}>
       {loading && <Loader />}
@@ -320,12 +316,12 @@ console.log(bedAssignData);
             <th scope="col" className="text-center">
               Email
             </th>
-            <th scope="col" className="text-center">
+            {/* <th scope="col" className="text-center">
               SSN
-            </th>
-            <th scope="col" className="text-center">
+            </th> */}
+            {/* <th scope="col" className="text-center">
               Room No
-            </th>
+            </th> */}
             <th scope="col" className="text-center">
               Bed No
             </th>
@@ -369,11 +365,10 @@ console.log(bedAssignData);
                   {patient.basicDetails[0].birthDate}
                 </td>
                 <td className="text-center">{patient.email}</td>
-                <td className="text-center">{patient.basicDetails[0].ssn}</td>
-                <td className="text-center">{patient.bedAssignData?.roomNo}</td>
-                <td className="text-center">{patient.bedAssignData?.bedNo}</td>
+                {/* <td className="text-center">{patient.basicDetails[0].ssn}</td>
+                <td className="text-center">{patient.bedAssignData?.roomNo}</td> */}
+                <td className="text-center">{patient.assignedBed}</td>
                 <td className="text-center">{patient.beaconDevice}</td>
-
                 {/* <td>{patient.basicDetails[0].gender}</td> */}
                 <td className="text-center">
                   <Button
@@ -381,6 +376,7 @@ console.log(bedAssignData);
                    variant="contained" color="success">
                     In Active
                     </Button>
+
                     {/* <FontAwesomeIcon
                     icon={faUserSlash}
                     className="text-dark"
@@ -389,10 +385,13 @@ console.log(bedAssignData);
                   /> */}
                   
                 </td>
+
               </tr>
             ))}
+            
         </tbody>
       </Table>
+      
       {/* <Modal isOpen={editModal} toggle={() => setEditModal(false)} centered>
           <ModalHeader toggle={() => setEditModal(false)}>
             <h3>Patient Details</h3>

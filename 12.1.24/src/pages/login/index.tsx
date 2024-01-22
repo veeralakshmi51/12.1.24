@@ -90,7 +90,7 @@ import { useNavigate } from "react-router-dom";
 import { getOrganization, handleLogin } from "../../slices/thunk";
 import { useDispatch, useSelector } from "react-redux";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
-
+import { Link } from "react-router-dom";
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<any>();
@@ -169,14 +169,14 @@ const Login = () => {
         }}
       />
     </div>
-          <div className="d-flex mt-2 row">
-          <div className="form-check col-md-4">
+          <div className="d-flex mt-4 m-2 row">
+          <div className="form-check col-md-6">
             <input 
               type="checkbox"
               className="form-check-input p-0"
               id="exampleCheck1"
             />
-            <label className="form-check-label" style={{fontSize:'10px'}} htmlFor="exampleCheck1">
+            <label className="form-check-label" style={{fontSize:'20px'}} htmlFor="exampleCheck1">
               Remember Me
             </label>
           </div>
@@ -186,11 +186,13 @@ const Login = () => {
           <button
             type="submit"
             className="btn btn-primary col-md-12"
+            
           >
             Login
           </button>
-          <p className="col-md-8 text-end mt-3" style={{fontSize:'20px'}}>Forgot Password?</p>
-        </form>
+          <div className="mt-3">
+        Forgot Password <Link to="/forgot-password">Click Here!</Link>
+      </div>        </form>
         </div>
         </div>
       </div>

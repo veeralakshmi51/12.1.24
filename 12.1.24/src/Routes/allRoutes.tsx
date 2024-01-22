@@ -18,6 +18,9 @@ import BedCreation from '../pages/bedAssign/bedCreation'
 import PatientUpdation from '../pages/Patient/patientUpdate'
 import StaffUpdation from '../pages/Staff/staffUpdate'
 import OrganizationUpdate from '../pages/organizationDetails/organizationUpdate'
+import ForgotPassword from '../pages/forgotpassword'
+import ChangePassword from '../pages/changePassword'
+import VerifyOtp from '../pages/verifyOtp'
 const SuperAdminRoutes = [ 
 
   { path: '/dashboard', component: <Dashboard /> },
@@ -46,7 +49,10 @@ const AdminRoutes = [
 const publicRoutes = [
   { path: '/', exact: true, component: <Navigate to="/login" /> },
   {path: '/login', component: <Login />},
-  {path: '/secret-key', component: <SecretKey />}
+  {path: '/secret-key', component: <SecretKey />},
+  {path:'/forgot-password', component:<ForgotPassword/>},
+  {path:'/verify-otp',component:<VerifyOtp/>},
+  {path:'/change-password',component:<ChangePassword/>}
 ]
 
 export { AdminRoutes, SuperAdminRoutes, publicRoutes }

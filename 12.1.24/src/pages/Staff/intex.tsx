@@ -135,9 +135,9 @@ const Staff: React.FC = () => {
     if (confirmDelete) {
       try {
         await dispatch(deleteStaffDetails(username, organization));
-        toast.success("Staff Details deleted successfully");
+        alert("Staff Details deleted successfully");
       } catch (error) {
-        toast.error("Failed to delete organization");
+        alert("Failed to delete organization");
       }
     }
   };

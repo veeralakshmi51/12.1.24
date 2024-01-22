@@ -49,7 +49,7 @@ interface FormData {
   email: string;
   deviceId: string;
   active:boolean;
-  assignedBed:string;
+  // assignedBed:string;
 }
 
 const PatientCreation: React.FC = () => {
@@ -76,7 +76,7 @@ const PatientCreation: React.FC = () => {
     email: '',
     deviceId: '',
     active:true,
-    assignedBed:'',
+    // assignedBed:'',
   });
 
   useEffect(() => {
