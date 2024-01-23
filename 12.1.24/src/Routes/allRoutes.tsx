@@ -21,6 +21,7 @@ import OrganizationUpdate from '../pages/organizationDetails/organizationUpdate'
 import ForgotPassword from '../pages/forgotpassword'
 import ChangePassword from '../pages/changePassword'
 import VerifyOtp from '../pages/verifyOtp'
+import ResetSecretKey from '../pages/resetSecretKey'
 const SuperAdminRoutes = [ 
 
   { path: '/dashboard', component: <Dashboard /> },
@@ -32,7 +33,7 @@ const SuperAdminRoutes = [
 
 const AdminRoutes = [
   { path: '/q15-staff-configuration', component: <Q15StaffConfiguration /> },
-  { path: '/patient-table', component: <Patient />},
+  { path: '/management/patient-table', component: <Patient />},
   { path: '/staff-table', component: <Staff /> },
   { path: '/Beacon-register', component: <Beacon/>},
   { path: '/staff-register', component: <StaffCreation/>},
@@ -40,7 +41,7 @@ const AdminRoutes = [
   { path: '/q15-report', component: <Q15Report/>},
   {path:'/management/bed-assign', component:<BedCreation />},
   {path:'/management/bed-table',component:<BedAssign/>},
-  {path:'/management/patient-assign',component:<PatientAssign/>},
+  {path:'/patient-assign',component:<PatientAssign/>},
   {path:'/patient-update/:id',component:<PatientUpdation />},
   {path:'/staff-update/:id',component:<StaffUpdation/>}
 
@@ -52,7 +53,8 @@ const publicRoutes = [
   {path: '/secret-key', component: <SecretKey />},
   {path:'/forgot-password', component:<ForgotPassword/>},
   {path:'/verify-otp',component:<VerifyOtp/>},
-  {path:'/change-password',component:<ChangePassword/>}
+  {path:'/change-password',component:<ChangePassword/>},
+  {path:'/resetSecretKey',component:<ResetSecretKey/>}
 ]
 
 export { AdminRoutes, SuperAdminRoutes, publicRoutes }

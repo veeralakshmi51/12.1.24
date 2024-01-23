@@ -59,6 +59,7 @@ const PatientCreation: React.FC = () => {
   const [selectedValues, setSelectedValues] = useState<any>({
     gender: [],
     country: [],
+    state:[],
   });
 
   const [formValues, setFormValues] = useState<FormData>({
@@ -540,7 +541,7 @@ const PatientCreation: React.FC = () => {
             <TextField id="outlined-basic-1" label="City" variant="outlined" fullWidth onChange={(e) => setFormValues({ ...formValues, city: e.target.value })} />
           </div>
           <div className='col-md-4 mb-2'>
-            <TextField id="outlined-basic-2" label="State/Provide" variant="outlined" fullWidth onChange={(e) => setFormValues({ ...formValues, state: e.target.value })} />
+            {renderDropdown('state')}
           </div>
           <div className='col-md-4 mb-2'>
             <TextField id="outlined-basic-3" label="Zip/Postal Code" variant="outlined" fullWidth onChange={(e) => setFormValues({ ...formValues, postalCode: e.target.value })} />

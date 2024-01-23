@@ -7,14 +7,24 @@ import "primeicons/primeicons.css";
 import "primeflex/primeflex.css";
 import Image1 from '../../assets/images/Image1.png';
 import { useSelector } from "react-redux";
-import { secretKeyVerify } from "../../slices/secretkey/thunk";
+import { SecretKeyVerify } from "../../slices/secretkey/thunk";
 import { useNavigate } from "react-router-dom";
+
+interface Data{
+  email:string;
+  jwt:string;
+}
 
 const SecretKey = () => {
   const jwt = useSelector((state: any) => state.Login.jwt);
+  // const {userType} = useSelector((state:any)=>state.Login)
   const navigate = useNavigate()
   const [secretKey, setSecretKey] = useState("");
   const otpInputsRef = useRef<HTMLInputElement[]>([]);
+  const [data,setData]=useState<Data>({
+    email:"",
+    jwt:"",
+  })
 
   const handlePinChange = (index: number, value: string) => {
     const newSecretKey = secretKey.split("");
@@ -58,7 +68,9 @@ const SecretKey = () => {
       secretKey,
       jwt
     }
-    secretKeyVerify(body,navigate)
+    SecretKeyVerify(body,navigate)
+    // localStorage.setItem('savedEmail', data.jwt);
+
   }
   useEffect(() => {
     const handleBackspaceGlobal = (e: KeyboardEvent) => {
@@ -68,7 +80,7 @@ const SecretKey = () => {
         setSecretKey(newSecretKey.join(""));
       }
     };
-
+console.log('jwt',jwt)
     document.addEventListener("keydown", handleBackspaceGlobal);
 
     return () => {
@@ -84,13 +96,13 @@ const SecretKey = () => {
 
 
   return (
-    <div className="p-grid passcode-section" style={{ background: '#fff', width:'100vw', height:'100vh' }}>
+    <div className="p-grid passcode-section" style={{ background: '#fff', width:'100%', height:'100%' }}>
       <div className="p-col-12 p-md-7" style={{ backgroundColor: '#fff', display: 'flex', flexDirection: 'column', marginLeft: '-6px', height: '101%' }}>
         <img src={Image1} style={{ height: '-webkit-fill-available', marginRight: '-7px' }} alt="Passcode Image"></img>
       </div>
       <div className="p-col-12 p-md-1" id="removePadding"></div>
       <div className="p-col-12 p-md-3 passcode-secondPage d-flex flex-column justify-content-center align-item-center " id="removePadding">
-        <div><span style={{ display: 'block' }} className="passCodeText">Enter your Passcode :</span></div>
+        <div><span style={{ display: 'block' }} className="passCodeText"><h4>Enter your Passcode :</h4></span></div>
         <div className=" p-4 d-flex gap-3" style={{width:'5px'}}>
           {[0, 1, 2, 3, 4, 5].map(index => (
             <input
@@ -102,7 +114,7 @@ const SecretKey = () => {
               onChange={(e) => handlePinChange(index, e.target.value)}
               onKeyDown={(e) => handleBackspace(index, e)}
               maxLength={1}
-              style={{ width: '40px', height: '40px', display:'flex', justifyContent:'center', alignItems:'center', border: '1px solid #0f3995', textAlign: 'center', padding: '15px', borderRadius: '8px' }}
+              style={{ width: '40px', height: '40px', display:'flex', justifyContent:'center', alignItems:'center', border: '2px solid #082768', textAlign: 'center', padding: '15px', borderRadius: '8px' }}
               ref={(ref: HTMLInputElement | null) => {
                 if (ref) {
                   otpInputsRef.current[index] = ref;
@@ -112,9 +124,9 @@ const SecretKey = () => {
           ))}
         </div>
         <div className="buttonPasscode">
-          <Button onClick={handleVerify} style={{ width: '321px', position: 'relative', fontFamily: 'Poppins', fontWeight: 'bold', fontSize: '16px', height: '48px', backgroundColor: '#1F489F' }} label="Submit"></Button>
+          <Button onClick={handleVerify} style={{ width: '380px', position: 'relative', fontFamily: 'Poppins', fontWeight: 'bold', fontSize: '16px', height: '48px', backgroundColor: '#1F489F' }} label="Submit"></Button>
         </div>
-        <a onClick={()=>alert('clicked')} style={{ cursor: 'pointer' }}><div className="forgotPassCode">Forgot Passcode?</div></a>
+        <a onClick={()=>navigate('/resetSecretKey')} style={{ cursor: 'pointer',marginTop:'20px',color:'blue'}}><div className="forgotPassCode">Forgot Passcode?</div></a>
       </div>
       <div className="p-col-12 p-md-1"></div>
     </div>

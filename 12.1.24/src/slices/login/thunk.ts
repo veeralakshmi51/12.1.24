@@ -15,6 +15,7 @@ export const handleLogin = async (dispatch: any, body: any, navigate: (p: string
             dispatch(saveUserType(userType[0]));
             dispatch(saveUserDetails(session.username));
             dispatch(saveOrganization(organization));
+            localStorage.setItem('jwtToken', jwt.jwtToken);
             navigate('/secret-key');
         } else {
             alert("Login failed: " + response.data.message.description);

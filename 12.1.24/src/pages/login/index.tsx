@@ -91,6 +91,8 @@ import { getOrganization, handleLogin } from "../../slices/thunk";
 import { useDispatch, useSelector } from "react-redux";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
 import { Link } from "react-router-dom";
+import { AccountCircle,Visibility,} from "@mui/icons-material";
+
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<any>();
@@ -149,6 +151,14 @@ const Login = () => {
         variant="outlined"
         fullWidth
         onChange={(e) => setUsername(e.target.value)}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <AccountCircle style={{color:'darkblue'}} />
+            </InputAdornment>
+          ),
+        }}
+
       />
 
       <TextField
@@ -160,12 +170,12 @@ const Login = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={handlePasswordVisibility} edge="end">                
-              </IconButton>
+          startAdornment: (
+            <InputAdornment position="start">
+              <Visibility style={{color:'darkblue'}} />
             </InputAdornment>
           ),
+          
         }}
       />
     </div>
@@ -190,9 +200,11 @@ const Login = () => {
           >
             Login
           </button>
-          <div className="mt-3">
-        Forgot Password <Link to="/forgot-password">Click Here!</Link>
-      </div>        </form>
+          <div className="mt-3" style={{fontSize:'20px'}}>
+        Forgot Password 
+         <Link to="/forgot-password" style={{color:'blue'}}> {""}Click Here!</Link>
+         </div>        
+         </form>
         </div>
         </div>
       </div>

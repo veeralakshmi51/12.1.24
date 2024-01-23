@@ -3,7 +3,7 @@ import axios from 'axios';
 const baseURL = 'http://47.32.254.89:7000/api'
 const successCode = 'MHC - 0200'
 
-export const secretKeyVerify = async (body: any, navigate: (p: string) => void) => {
+export const SecretKeyVerify = async (body: any, navigate: (p: string) => void) => {
     try {
         const response = await axios.post(`${baseURL}/user/verify`, body);
 

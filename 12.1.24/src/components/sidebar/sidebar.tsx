@@ -64,11 +64,12 @@ const Sidebar = (props: SidebarProps) => {
       show: userType === "Admin",
     },
     {
-      path: "/patient-table",
-      name: "Patient Creation",
-      icon: <FaUserFriends />,
+      path: "/patient-assign",
+      name: "Patient Assign",
+      icon: <FaUserInjured />,
       show: userType === "Admin",
     },
+    
     {
       path: "/Beacon-register",
       name: "Beacon Devices",
@@ -96,9 +97,9 @@ const Sidebar = (props: SidebarProps) => {
           show: userType === "Admin",
         },
         {
-          path: "/management/patient-assign",
-          name: "Patient Assign",
-          icon: <FaUserInjured />,
+          path: "/management/patient-table",
+          name: "Patient Creation",
+          icon: <FaUserFriends />,
           show: userType === "Admin",
         },
       ],

@@ -69,16 +69,19 @@
 // export default ChangePassword;
 import React, { useState, useEffect } from "react";
 import Image3 from '../../assets/images/image3.png';
-import { TextField } from "@mui/material";
+import { InputAdornment, TextField } from "@mui/material";
 import { Button } from "reactstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Security,Lock} from "@mui/icons-material";
 interface Data{
   email:string;
   newPassword:string;
   confirmNewPass:string;
 }
 const ChangePassword = () => {
+const [passwordsMatch, setPasswordsMatch] = useState(true); // State to track password matching
+
 const [data,setData]=useState<Data>({
   email:"",
   confirmNewPass:"",
@@ -88,17 +91,34 @@ const navigate=useNavigate();
 // const baseURL = 'http://47.32.254.89:7000/api'
 // const successCode = 'MHC - 0200'
 
- const handleRequest=async()=>{
-  try{
-    const response=await axios.post('http://47.32.254.89:7000/api/user/reset-password',data);
-    console.log('Response:',response.data);
-   if(response.data.message && response.data.message.code === 'MHC - 0200')
-   alert(response.data.message.description);
-    navigate('/login');
-  } catch(error){
-    console.log('Error:',error)
+useEffect(()=>{
+  const savedEmail=localStorage.getItem('savedEmail');
+  if(savedEmail){
+    setData((prevData)=>({...prevData,email:savedEmail}));
+  } else{
+    console.log('No Email found in local storage');
   }
- }
+},[]);
+ const handleRequest=async()=>{
+  if(data.newPassword===data.confirmNewPass){
+    try{
+      const response=await axios.post('http://47.32.254.89:7000/api/user/reset-password',data);
+      console.log('Response:',response.data);
+     if(response.data.message && response.data.message.code === 'MHC - 0200')
+     {
+     alert(response.data.message.description);
+     console.log('Alert password Changed')
+      navigate('/login');
+     }
+    } catch(error){
+      console.log('Error:',error)
+    }
+   }
+   else{
+    setPasswordsMatch(false);
+   }
+  }
+ 
   return (
     <div className="p-grid passcode-section" style={{ background: '#fff', width:'100vw', height:'100vh' }}>
       <div className="p-col-12 p-md-7" style={{ backgroundColor: '#fff', display: 'flex', flexDirection: 'column', marginLeft: '-6px', height: '101%' }}>
@@ -109,14 +129,7 @@ const navigate=useNavigate();
 
       <div className="d-flex flex-column gap-3">
         <label>Reset Password</label>
-      <TextField
-        id="outlined-basic-1"
-        label="Email"
-        variant="outlined"
-        fullWidth
-        value={data.email}
-        onChange={(e)=>setData({...data,email:e.target.value})}
-      />
+      
       <TextField
         id="outlined-basic-2"
         label="New Password"
@@ -125,6 +138,7 @@ const navigate=useNavigate();
         type="password"
         value={data.newPassword}
         onChange={(e)=>setData({...data,newPassword:e.target.value})}
+        InputProps={{startAdornment:(<InputAdornment position="start"><Security style={{color:'skyblue'}}/></InputAdornment>)}}
       />
       <TextField
         id="outlined-basic-3"
@@ -134,12 +148,15 @@ const navigate=useNavigate();
         type="password"
         value={data.confirmNewPass}
         onChange={(e)=>setData({...data,confirmNewPass:e.target.value})}
+        InputProps={{startAdornment:(<InputAdornment position="start"><Lock style={{color:'skyblue'}}/></InputAdornment>)}}
       />
       <Button color="info" style={{fontSize:'20px'}} onClick={handleRequest}>
               Change Password
             </Button>
       </div>
       </form>
+      {!passwordsMatch && <p style={{ color: 'red' }}>Passwords do not match.</p>}
+
       </div>
     </div>
    

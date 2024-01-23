@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import Image4 from '../../assets/images/image4.png';
-import { TextField } from "@mui/material";
+import Image4 from '../../assets/images/image5.png';
+import { InputAdornment, TextField } from "@mui/material";
 import { Button } from "reactstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { CheckCircleOutline } from "@mui/icons-material";
+
 interface Data{
   email:string;
   otp:string;
@@ -16,7 +18,14 @@ const [data,setData]=useState<Data>({
 const navigate=useNavigate();
 // const baseURL = 'http://47.32.254.89:7000/api'
 // const successCode = 'MHC - 0200'
-
+useEffect(()=>{
+  const savedEmail=localStorage.getItem('savedEmail');
+  if(savedEmail){
+    setData((prevData)=>({...prevData,email:savedEmail}));
+  } else{
+    console.log('No Mail Found in Local Storage')
+  }
+},[])
  const handleRequest=async()=>{
   try{
     const response=await axios.post('http://47.32.254.89:7000/api/user/verify-otp',data);
@@ -38,21 +47,16 @@ const navigate=useNavigate();
 
       <div className="d-flex flex-column gap-3">
         <label>OTP Verification</label>
-      <TextField
-        id="outlined-basic-1"
-        label="Email"
-        variant="outlined"
-        fullWidth
-        value={data.email}
-        onChange={(e)=>setData({...data,email:e.target.value})}
-      />
+      
       <TextField
       id="outlined-basic-2"
       label="OTP"
       variant="outlined"
       fullWidth
       value={data.otp}
-      onChange={(e)=>setData({...data,otp:e.target.value})}/>
+      type="password"
+      onChange={(e)=>setData({...data,otp:e.target.value})}
+      InputProps={{startAdornment:(<InputAdornment position="start"><CheckCircleOutline style={{color:'skyblue'}}/></InputAdornment>)}}/>
       <Button color="info" style={{fontSize:'20px'}} onClick={handleRequest}>
               Verify OTP
             </Button>
