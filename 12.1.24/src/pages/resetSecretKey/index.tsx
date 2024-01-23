@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Image2 from '../../assets/images/image2.png';
-import { TextField } from "@mui/material";
+import { InputAdornment, TextField } from "@mui/material";
 import { Button } from "reactstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Email } from "@mui/icons-material";
 interface Data{
   email:string;
   jwt:string;
@@ -29,12 +30,29 @@ const handleRequest = async () => {
     if (response.data.message && response.data.message.code === 'MHC - 0200') {
       navigate('/secret-key');
     }
-  } catch (error) {
-    console.log(error)
-    
-  }
-}
+  } catch (error:any) {
+    if (error.response) {
+      console.log('Server Error:', error.response.data);
+      console.log('Status Code:', error.response.status);
 
+      if (error.response.data && error.response.data.message) {
+        alert(`Error: ${error.response.data.message.description}`);
+      } else {
+        
+        alert('An unexpected error occurred. Please try again.');
+      }
+    } else if (error.request) {
+      console.log('Request Error:', error.request);
+
+      
+      alert('Network issue. Please try again.');
+    } else {
+      console.log('Error:', error);
+
+      alert('Please provide your valid Email Address');
+    }
+  }
+};
  useEffect(()=>{
   const savedJwt=localStorage.getItem('jwtToken');
   if(savedJwt){
@@ -62,6 +80,7 @@ const handleRequest = async () => {
         fullWidth
         value={data.email}
         onChange={(e)=>setData({...data,email:e.target.value})}
+        InputProps={{startAdornment:(<InputAdornment position="start"><Email style={{color:'skyblue'}}/></InputAdornment>)}}
       />
       <Button color="info" style={{fontSize:'20px'}} onClick={handleRequest}>
               Click to Send ResetKey
